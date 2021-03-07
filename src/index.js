@@ -5,6 +5,8 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { WEBGL } from './WEBGL';
 import SolarSystem from './SolarSystem';
+import { planetConfigs } from './planetsConfigs';
+import { CompressedPixelFormat } from 'three';
 
 if (WEBGL.isWebGLAvailable()) {
 	// Initiate function or other initializations here
@@ -21,39 +23,15 @@ function main() {
         bloomThreshold: 0,
         bloomRadius: 1
     };
-    const far = 50000;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, far);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 50000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
     const controls = new OrbitControls(camera, renderer.domElement);
 
-    const solarSystem = new SolarSystem();
-    console.log(solarSystem)
-
-    solarSystem.planets.forEach(planet => {
-        scene.add(planet.sphere);
-    });
-
-    // const size = 10000;
-    // const divisions = 100;
-    // const gridHelper = new THREE.GridHelper( size, divisions ); scene.add( gridHelper );
-
-    camera.position.y = -39;
-    camera.position.y = -950;
-    camera.position.z = 504;
-
-    const composer = new EffectComposer( renderer );
-    const renderPass = new RenderPass( scene, camera );
-    const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-    bloomPass.threshold = params.bloomThreshold;
-    bloomPass.strength = params.bloomStrength;
-    bloomPass.radius = params.bloomRadius;
-    
-    composer.addPass( renderPass );
-    composer.addPass( bloomPass );
-    
+    camera.position.set(0, -900, 500);
+    camera.layers.enable(1);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
     window.addEventListener('resize', () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -63,15 +41,59 @@ function main() {
         camera.updateProjectionMatrix();
     });
 
+    // Initialize solar system.
+    let time = new Date();
+    const solarSystem = new SolarSystem(time, planetConfigs);
+
+    solarSystem.sun.layers.enable(1);
+    scene.add(solarSystem.sun);
+
+    solarSystem.planets.forEach(planet => {
+        planet.sphere.layers.enable(1);
+        planet.orbit.layers.enable(1);
+        scene.add(planet.sphere);
+        scene.add(planet.orbit);
+
+        planet.label.layers.enable(2);
+        scene.add(planet.label);
+
+        planet.moons.forEach(moon => {
+            moon.sphere.layers.enable(1);
+            scene.add(moon.sphere);
+        })
+    })
+
+    // COMPOSER
+    const composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        params.bloomStrength,
+        params.bloomRadius,
+        params.bloomThreshold
+    );
+    
+    composer.addPass(renderPass);
+    composer.addPass(bloomPass);
+
     const animate = () => {
         requestAnimationFrame(animate);
         
-        solarSystem.time.setHours(solarSystem.time.getHours() + 1);
-        solarSystem.updatePlanetObjects();
+        time.setHours(time.getHours() + 1);
+        solarSystem.setTimeOfInterest(time);
+        solarSystem.updatePlanetaryPositions();
 
-        document.getElementById('info').innerHTML = `${solarSystem.time}`;
         controls.update();
+
+        renderer.autoClear = false;
+        renderer.clear();
+  
+        camera.layers.set(1);
         composer.render();
+        
+        renderer.clearDepth();
+        camera.layers.set(2);
+        renderer.render(scene, camera);
     };
 
     animate();

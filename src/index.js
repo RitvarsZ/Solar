@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Scene, PerspectiveCamera, WebGLRenderer, Vector2 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -24,9 +24,9 @@ function main() {
         bloomRadius: 1
     };
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 50000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 50000);
+    const renderer = new WebGLRenderer({ antialias: true });
     const controls = new OrbitControls(camera, renderer.domElement);
 
     camera.position.set(0, -900, 500);
@@ -59,7 +59,7 @@ function main() {
     const composer = new EffectComposer(renderer);
     const renderPass = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        new Vector2(window.innerWidth, window.innerHeight),
         params.bloomStrength,
         params.bloomRadius,
         params.bloomThreshold

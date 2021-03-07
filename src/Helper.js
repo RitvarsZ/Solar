@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Texture, SpriteMaterial, Sprite } from 'three';
 
 export function makeTextSprite(message, parameters) {
 	if (parameters === undefined) parameters = {};
@@ -35,8 +35,6 @@ export function makeTextSprite(message, parameters) {
 								  + borderColor.b + "," + borderColor.a + ")";
 
 	context.lineWidth = borderThickness;
-	// roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 6);
-	// 1.4 is extra height factor for text below baseline: g,j,p,q.
 	
 	// text color
 	context.fillStyle = "rgba(255, 255, 255, 1.0)";
@@ -44,13 +42,11 @@ export function makeTextSprite(message, parameters) {
 	context.fillText(message, borderThickness, fontsize + borderThickness);
 	
 	// canvas contents will be used for a texture
-	let texture = new THREE.Texture(canvas) 
+	let texture = new Texture(canvas) 
 	texture.needsUpdate = true;
 
-	let spriteMaterial = new THREE.SpriteMaterial( 
-        { map: texture, useScreenCoordinates: false }
-    );
-    const sprite = new THREE.Sprite(spriteMaterial);
+	let spriteMaterial = new SpriteMaterial({ map: texture });
+    const sprite = new Sprite(spriteMaterial);
     sprite.center.set(0.5, 0.5);
     sprite.scale.set(100,50,1.0);
     

@@ -11,12 +11,14 @@ body {
     width: 100vw;
 }
 
-#info {
-    color: #eee;
+.date {
+    background: #ececec2a;
+    color: #1C1E26;
 	position: absolute;
     top: 10px;
-    left: 10px;
-	width: 100%;
+    left: 50%;
 	z-index: 100;
-	display:block;
+    display:block;
+    padding: 1rem;
+    transform: translateX(-50%);
 }

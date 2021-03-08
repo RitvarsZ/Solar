@@ -29,7 +29,7 @@ function main() {
     const renderer = new WebGLRenderer({ antialias: true });
     const controls = new OrbitControls(camera, renderer.domElement);
 
-    camera.position.set(0, -900, 500);
+    camera.position.set(0, -700, 450);
     camera.layers.enable(1);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -45,6 +45,11 @@ function main() {
         planet.orbit.layers.enable(1);
         scene.add(planet.sphere);
         scene.add(planet.orbit);
+
+        if (planet.rings) {
+            planet.rings.layers.enable(1);
+            scene.add(planet.rings);
+        }
 
         planet.label.layers.enable(2);
         scene.add(planet.label);
@@ -70,15 +75,6 @@ function main() {
 
     const animate = () => {
         requestAnimationFrame(animate);
-
-        solarSystem.sun.rotation.z += 0.003;
-        solarSystem.planets.forEach(planet => {
-            if (planet.sphere.userData.clock && planet.sphere.userData.mixer) {
-                planet.sphere.userData.mixer.update(planet.sphere.userData.clock.getDelta());
-            }
-            planet.sphere.rotation.z += 0.003;
-            planet.moons.forEach(moon => { moon.sphere.rotation.z += 0.003 });
-        });
 
         controls.update();
 

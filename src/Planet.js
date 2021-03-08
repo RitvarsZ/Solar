@@ -9,7 +9,7 @@ gsap.registerPlugin(MotionPathPlugin);
 
 export default class Planet {
 
-    constructor({ color, distanceToSun, name, objectFun, size, moons }, timeOfInterest) {
+    constructor({ color, distanceToSun, name, objectFun, size, moons, rings = false }, timeOfInterest) {
         this.color = color;
         this.distanceToSun = distanceToSun;
         this.name = name;
@@ -26,8 +26,8 @@ export default class Planet {
         this.sphere.position.set(initialPos.x, initialPos.y, initialPos.z);
 
         this.orbit = new Mesh(
-            new RingGeometry(this.distanceToSun - 1, this.distanceToSun, 512),
-            new MeshBasicMaterial({ color: 0xffffff, side: DoubleSide })
+            new RingGeometry(this.distanceToSun - 5, this.distanceToSun, 512),
+            new MeshBasicMaterial({ color: 0x777777, side: DoubleSide })
         );
 
         // Initialize moons
@@ -36,10 +36,25 @@ export default class Planet {
             this.moons.push(new Moon(moon, timeOfInterest));
         });
 
+        // Add rings if enabled
+        this.rings = false;
+        if (rings) {
+            this.rings = new Mesh(
+                new RingGeometry(this.size + 10, this.size + 25, 32),
+                new MeshBasicMaterial({ color: 0x585834, side: DoubleSide })
+            );
+            this.rings.rotation.y = 0.2;
+            this.rings.rotation.x = 0.2;
+            this.rings.position.set(this.sphere.position.x, this.sphere.position.y, this.sphere.position.z);
+            console.log(this.rings.position);
+            console.log(this.sphere.position)
+        }
+
         // Make label
         this.label = makeTextSprite(this.name, { fontSize: 48, backgroundColor: { r:255, g:255, b:255, a:1 }});
 
         this.updateObjectPositions(timeOfInterest);
+
     }
 
     async updateObjectPositions(timeOfInterest) {
@@ -83,7 +98,7 @@ export default class Planet {
             });
 
             const timelinePlanets = new TimelineMax();
-            timelinePlanets.to(this.sphere.position, {
+            timelinePlanets.to([this.sphere.position, this.rings.position], {
                 motionPath: {
                     path: [{ ...this.sphere.position }, { ...midPointCoords }, { ...endPosition }],
                     type: "cube"

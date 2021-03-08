@@ -20,7 +20,7 @@ export default class Planet {
         // Initialize sphere and orbit
         const initialPos = spherical2rectangular({lat: 0, lon: this.angle, radiusVector: this.distanceToSun})
         this.sphere = new Mesh(
-            new SphereGeometry(this.size, 7, 7),
+            new SphereGeometry(this.size, this.size, this.size),
             new MeshBasicMaterial({ color: color })
         );
         this.sphere.position.set(initialPos.x, initialPos.y, initialPos.z);

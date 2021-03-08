@@ -13,7 +13,7 @@ export default class SolarSystem {
 
         // Initialize sun
         this.sun = new Mesh(
-            new SphereGeometry(40, 7, 7),
+            new SphereGeometry(40, 40, 40),
             new MeshBasicMaterial({color: 0xffff00})
         );
 

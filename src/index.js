@@ -19,9 +19,9 @@ if (WEBGL.isWebGLAvailable()) {
 function main() {
     const params = {
         exposure: 1.5,
-        bloomStrength: 1.8,
+        bloomStrength: 1.2,
         bloomThreshold: 0,
-        bloomRadius: 1
+        bloomRadius: 0.8
     };
 
     const scene = new Scene();
